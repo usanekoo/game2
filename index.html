@@ -124,6 +124,22 @@
             margin-top: 20px;
             font-size: 14px;
         }
+        #hpBar {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    width: 150px;
+    height: 15px;
+    background-color: #333;
+    border: 1px solid #0f0;
+}
+
+#hpFill {
+    height: 100%;
+    width: 100%;
+    background-color: #0f0;
+    transition: width 0.2s;
+}
     </style>
 </head>
 <body>
@@ -132,6 +148,9 @@
     <div id="gameWindow">
         <div id="score">Score: 0</div>
         <div id="health">HP: 100/100</div>
+        <div id="hpBar">
+    <div id="hpFill"></div>
+</div>
         <div id="player"></div>
         <div id="gameOverScreen">
             <h2>GAME OVER</h2>
@@ -263,6 +282,16 @@
                 // プレイヤーとの衝突
                 if (checkCollision(game.enemies[i], { x: game.playerX, y: game.playerY, width: game.playerWidth, height: game.playerHeight })) {
                     game.health -= 20;
+                    let percent = (game.health / game.maxHealth) * 100;
+hpFill.style.width = percent + "%";
+
+if (percent > 50) {
+    hpFill.style.backgroundColor = "#0f0";
+} else if (percent > 20) {
+    hpFill.style.backgroundColor = "#ff0";
+} else {
+    hpFill.style.backgroundColor = "#f00";
+}
                     healthDisplay.textContent = 'HP: ' + game.health + '/' + game.maxHealth;
                     game.enemies.splice(i, 1);
 
@@ -311,6 +340,7 @@
             game.gameActive = false;
             gameOverScreen.style.display = 'flex';
             finalScoreDisplay.textContent = 'Score: ' + game.score;
+            const hpFill = document.getElementById('hpFill');
         }
 
         // リセット
@@ -325,6 +355,8 @@
             gameOverScreen.style.display = 'none';
             scoreDisplay.textContent = 'Score: 0';
             healthDisplay.textContent = 'HP: 100/100';
+            hpFill.style.width = "100%";
+hpFill.style.backgroundColor = "#0f0";
         }
 
         // ゲームループ
