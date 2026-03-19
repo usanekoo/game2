@@ -183,7 +183,10 @@
             score: 0,
             gameActive: true,
             bullets: [],
-            enemies: []
+            enemies: [],
+            invincible: false,
+invincibleTime: 0,
+invincibleDuration: 60, // 約1秒（60fps）
         };
 
         let keys = {};
@@ -251,7 +254,13 @@
         // ゲーム更新
         function update() {
             if (!game.gameActive) return;
+if (game.invincible) {
+    game.invincibleTime++;
 
+    if (game.invincibleTime > game.invincibleDuration) {
+        game.invincible = false;
+    }
+}
             movePlayer();
 
             // 弾の更新
@@ -281,7 +290,19 @@
 
                 // プレイヤーとの衝突
                 if (checkCollision(game.enemies[i], { x: game.playerX, y: game.playerY, width: game.playerWidth, height: game.playerHeight })) {
-                    game.health -= 20;
+                    if (!game.invincible) {
+    game.health -= 20;
+    if (game.health < 0) game.health = 0;
+
+    game.invincible = true;
+    game.invincibleTime = 0;
+
+    healthDisplay.textContent = 'HP: ' + game.health + '/' + game.maxHealth;
+
+    if (game.health <= 0) {
+        endGame();
+    }
+};
                     let percent = (game.health / game.maxHealth) * 100;
 hpFill.style.width = percent + "%";
 
@@ -321,6 +342,11 @@ if (percent > 50) {
                 bulletEl.style.top = bullet.y + 'px';
                 gameWindow.appendChild(bulletEl);
             });
+            if (game.invincible) {
+    player.style.opacity = (game.invincibleTime % 10 < 5) ? "0.3" : "1";
+} else {
+    player.style.opacity = "1";
+}
 
             // 敵を描画
             const oldEnemies = document.querySelectorAll('.enemy');
